@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminDb } from "@/app/lib/firebase-admin";
+import { getAdminDb } from "@/app/lib/firebase-admin";
 import { isAuthorized } from "@/app/lib/api-auth";
 
 export async function GET(request: NextRequest) {
@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const adminDb = getAdminDb();
     const snapshot = await adminDb.ref("data").get();
 
     if (!snapshot.exists()) {
