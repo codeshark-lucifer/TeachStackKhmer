@@ -43,9 +43,13 @@ export async function GET(
     }
 
     return NextResponse.json(category);
-  } catch (error) {
+  } catch (error: any) {
+    console.error("API Error:", error);
     return NextResponse.json(
-      { error: "Failed to fetch category" },
+      { 
+        error: "Failed to fetch category",
+        message: error?.message || "Unknown error"
+      },
       { status: 500 }
     );
   }

@@ -14,10 +14,11 @@ function getAdminApp() {
   };
 
   if (!serviceAccount.privateKey) {
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("FIREBASE_PRIVATE_KEY is missing");
-    }
-    // Return a dummy or handle accordingly for dev/build
+    throw new Error("FIREBASE_PRIVATE_KEY is missing or empty. Please check your environment variables.");
+  }
+
+  if (!process.env.FIREBASE_DATABASE_URL) {
+    throw new Error("FIREBASE_DATABASE_URL is missing. Please check your environment variables.");
   }
 
   app =
@@ -25,7 +26,7 @@ function getAdminApp() {
       ? getApps()[0]
       : initializeApp({
           credential: cert(serviceAccount as any),
-          databaseURL: process.env.FIREBASE_DATABASE_URL!,
+          databaseURL: process.env.FIREBASE_DATABASE_URL,
         });
 
   return app;
