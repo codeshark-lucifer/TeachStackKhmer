@@ -1,7 +1,7 @@
 import requests
 from requests.exceptions import HTTPError, Timeout
 
-url = "https://teach-stack-khmer.vercel.app/api/category/education"
+url = "http://127.0.0.1:3000/api/category/education"
 headers = {
     # Headers must be Key: Value pairs
     "x-api-token": "93be302a20343ee34f4049757949185554b479d6ff847766183412724981177d",
