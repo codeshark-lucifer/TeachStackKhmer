@@ -12,25 +12,26 @@ export async function GET(request: NextRequest) {
 
   try {
     const adminDb = getAdminDb();
-    const snapshot = await adminDb.ref("data/categories").get();
+    const snapshot = await adminDb.ref("data/examTypes").get();
 
     if (!snapshot.exists()) {
       return NextResponse.json([]);
     }
 
-    const categories = snapshot.val();
-    const categoriesArray = Object.entries(categories || {}).map(([id, data]: [string, any]) => ({
-      ...data,
-      id: data.id || id
-    }));
+    const examTypes = snapshot.val();
+    const examTypesArray = Array.isArray(examTypes) 
+      ? examTypes 
+      : Object.entries(examTypes || {}).map(([id, data]: [string, any]) => ({
+          ...data,
+          id: data.id || id
+        }));
     
-    return NextResponse.json(categoriesArray);
+    return NextResponse.json(examTypesArray.filter(Boolean));
   } catch (error: any) {
     console.error("API Error:", error);
-
     return NextResponse.json(
       {
-        error: "Failed to fetch categories",
+        error: "Failed to fetch exam types",
         message: error?.message || "Unknown error",
       },
       { status: 500 }

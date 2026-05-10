@@ -26,7 +26,11 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(snapshot.val());
+    const data = snapshot.val();
+    return NextResponse.json({
+      ...data,
+      id: data.id || id
+    });
   } catch (error: any) {
     console.error("API Error:", error);
     return NextResponse.json(

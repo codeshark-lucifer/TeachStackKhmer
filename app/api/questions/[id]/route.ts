@@ -23,7 +23,9 @@ export async function GET(
       return NextResponse.json([]);
     }
 
-    return NextResponse.json(snapshot.val());
+    const data = snapshot.val();
+    const questions = Array.isArray(data) ? data : Object.values(data || {});
+    return NextResponse.json(questions.filter(Boolean));
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to fetch questions" },

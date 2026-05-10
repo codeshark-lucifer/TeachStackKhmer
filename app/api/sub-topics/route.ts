@@ -12,25 +12,32 @@ export async function GET(request: NextRequest) {
 
   try {
     const adminDb = getAdminDb();
-    const snapshot = await adminDb.ref("data/categories").get();
+    const snapshot = await adminDb.ref("data/subTopicData").get();
 
     if (!snapshot.exists()) {
-      return NextResponse.json([]);
+      return NextResponse.json({});
     }
 
-    const categories = snapshot.val();
-    const categoriesArray = Object.entries(categories || {}).map(([id, data]: [string, any]) => ({
-      ...data,
-      id: data.id || id
-    }));
+    const data = snapshot.val();
+    const processedData: Record<string, any[]> = {};
     
-    return NextResponse.json(categoriesArray);
+    if (data) {
+      Object.entries(data).forEach(([key, value]) => {
+        processedData[key] = Array.isArray(value) 
+          ? value 
+          : Object.entries(value || {}).map(([id, item]: [string, any]) => ({
+              ...item,
+              id: item.id || id
+            }));
+      });
+    }
+
+    return NextResponse.json(processedData);
   } catch (error: any) {
     console.error("API Error:", error);
-
     return NextResponse.json(
       {
-        error: "Failed to fetch categories",
+        error: "Failed to fetch sub-topic data",
         message: error?.message || "Unknown error",
       },
       { status: 500 }
