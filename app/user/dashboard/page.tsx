@@ -147,6 +147,13 @@ export default function DashboardPage() {
 
           <div className="flex gap-3">
             <button
+              onClick={() => router.push("/user/search")}
+              className="rounded-xl bg-zinc-800 px-4 py-2 hover:bg-zinc-700"
+            >
+              Search 🔍
+            </button>
+
+            <button
               onClick={openCreate}
               className="rounded-xl bg-emerald-600 px-4 py-2 hover:bg-emerald-500"
             >

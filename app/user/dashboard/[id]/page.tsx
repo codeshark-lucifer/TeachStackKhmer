@@ -290,6 +290,24 @@ export default function CategoryPage() {
 
                 <option value={3}>Correct Answer: Option 4</option>
               </select>
+
+              {/* TAGS */}
+              <input
+                value={form.tags?.join(", ") || ""}
+                onChange={(e) => {
+                  const tags = e.target.value
+                    .split(",")
+                    .map((tag) => tag.trim())
+                    .filter((tag) => tag !== "");
+                  
+                  setForm({
+                    ...form,
+                    tags,
+                  });
+                }}
+                placeholder="Tags (e.g. culture, math, highschool)"
+                className="rounded-xl bg-zinc-800 px-4 py-3 outline-none"
+              />
             </div>
 
             {/* ACTIONS */}
