@@ -35,8 +35,6 @@ export default function CategoryPage() {
 
   const id = params.id as string;
 
-  const [allData, setAllData] = useState<any[]>([]);
-
   const [category, setCategory] = useState<Category | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -54,22 +52,14 @@ export default function CategoryPage() {
 
   async function fetchData() {
     try {
-      const snapshot = await get(ref(db, "data"));
+      const snapshot = await get(ref(db, `data/categories/${id}`));
 
       if (!snapshot.exists()) {
         setLoading(false);
         return;
       }
 
-      const data = snapshot.val();
-
-      const categories = Array.isArray(data) ? data : Object.values(data);
-
-      setAllData(categories);
-
-      const found = categories.find((item: any) => item.id === id);
-
-      setCategory(found || null);
+      setCategory(snapshot.val());
     } catch (error) {
       console.error(error);
     }
@@ -107,29 +97,23 @@ export default function CategoryPage() {
       updatedQuestions.push(form);
     }
 
-    const updatedCategories = allData.map((item) => {
-      if (item.id === category.id) {
-        return {
-          ...item,
-          questions: updatedQuestions,
-        };
-      }
+    try {
+      await set(ref(db, `data/categories/${id}/questions`), updatedQuestions);
 
-      return item;
-    });
+      setCategory({
+        ...category,
+        questions: updatedQuestions,
+      });
 
-    await set(ref(db, "data"), updatedCategories);
+      setIsOpen(false);
 
-    setCategory({
-      ...category,
-      questions: updatedQuestions,
-    });
+      setForm(emptyQuestion);
 
-    setIsOpen(false);
-
-    setForm(emptyQuestion);
-
-    setEditingIndex(null);
+      setEditingIndex(null);
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save.");
+    }
   }
 
   // DELETE QUESTION
@@ -142,23 +126,17 @@ export default function CategoryPage() {
 
     const updatedQuestions = category.questions.filter((_, i) => i !== index);
 
-    const updatedCategories = allData.map((item) => {
-      if (item.id === category.id) {
-        return {
-          ...item,
-          questions: updatedQuestions,
-        };
-      }
+    try {
+      await set(ref(db, `data/categories/${id}/questions`), updatedQuestions);
 
-      return item;
-    });
-
-    await set(ref(db, "data"), updatedCategories);
-
-    setCategory({
-      ...category,
-      questions: updatedQuestions,
-    });
+      setCategory({
+        ...category,
+        questions: updatedQuestions,
+      });
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete.");
+    }
   }
 
   if (loading) {

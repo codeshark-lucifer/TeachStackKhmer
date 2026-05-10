@@ -17,32 +17,16 @@ export async function GET(
 
   try {
     const adminDb = getAdminDb();
-    const snapshot = await adminDb.ref("data").get();
+    const snapshot = await adminDb.ref(`data/categories/${id}`).get();
 
     if (!snapshot.exists()) {
-      return NextResponse.json(
-        { error: "Not found" },
-        { status: 404 }
-      );
-    }
-
-    const data = snapshot.val();
-    const categories = Array.isArray(data)
-      ? data
-      : Object.values(data);
-
-    const category = categories.find(
-      (item: any) => item.id === id
-    );
-
-    if (!category) {
       return NextResponse.json(
         { error: "Category not found" },
         { status: 404 }
       );
     }
 
-    return NextResponse.json(category);
+    return NextResponse.json(snapshot.val());
   } catch (error: any) {
     console.error("API Error:", error);
     return NextResponse.json(

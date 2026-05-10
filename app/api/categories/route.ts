@@ -12,13 +12,14 @@ export async function GET(request: NextRequest) {
 
   try {
     const adminDb = getAdminDb();
-    const snapshot = await adminDb.ref("data").get();
+    const snapshot = await adminDb.ref("data/categories").get();
 
     if (!snapshot.exists()) {
       return NextResponse.json([]);
     }
 
-    return NextResponse.json(snapshot.val());
+    const categories = snapshot.val();
+    return NextResponse.json(Object.values(categories));
   } catch (error: any) {
     console.error("API Error:", error);
 

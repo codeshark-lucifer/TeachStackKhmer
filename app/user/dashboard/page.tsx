@@ -9,6 +9,7 @@ import {
   onValue,
   ref,
   set,
+  remove,
 } from "firebase/database";
 
 import { useRouter } from "next/navigation";
@@ -49,17 +50,12 @@ export default function DashboardPage() {
 
   // LOAD DATABASE
   useEffect(() => {
-    const databaseRef = ref(db, "data");
+    const databaseRef = ref(db, "data/categories");
 
     const unsubscribe = onValue(databaseRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-
-        if (Array.isArray(data)) {
-          setCategories(data);
-        } else {
-          setCategories(Object.values(data));
-        }
+        setCategories(Object.values(data));
       } else {
         setCategories([]);
       }
@@ -106,15 +102,7 @@ export default function DashboardPage() {
   // SAVE CATEGORY
   async function saveCategory() {
     try {
-      const updated = [...categories];
-
-      if (editingIndex !== null) {
-        updated[editingIndex] = form;
-      } else {
-        updated.push(form);
-      }
-
-      await set(ref(db, "data"), updated);
+      await set(ref(db, `data/categories/${form.id}`), form);
 
       setIsOpen(false);
 
@@ -130,21 +118,22 @@ export default function DashboardPage() {
   // DELETE CATEGORY
   async function deleteCategory(
     e: React.MouseEvent,
-    index: number
+    item: Category
   ) {
     e.stopPropagation();
 
     const confirmDelete = confirm(
-      "Delete this category?"
+      `Delete category "${item.title}"?`
     );
 
     if (!confirmDelete) return;
 
-    const updated = categories.filter(
-      (_, i) => i !== index
-    );
-
-    await set(ref(db, "data"), updated);
+    try {
+      await remove(ref(db, `data/categories/${item.id}`));
+    } catch (error) {
+      console.error(error);
+      alert("Failed to delete.");
+    }
   }
 
   return (
@@ -219,7 +208,7 @@ export default function DashboardPage() {
 
                     <button
                       onClick={(e) =>
-                        deleteCategory(e, index)
+                        deleteCategory(e, item)
                       }
                       className="rounded-lg bg-red-600 px-3 py-1 text-sm hover:bg-red-500"
                     >
